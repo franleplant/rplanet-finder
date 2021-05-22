@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@types/node-notifier": "^8.0.0",
     "atomicmarket": "^0.1.1",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
@@ -12,6 +13,8 @@
     "typescript": "^4.2.4"
   },
   "devDependencies": {
+    "@tsconfig/node14": "^1.0.0",
+    "@types/lodash": "^4.14.170",
     "@types/node-fetch": "^2.5.10",
     "husky": ">=6",
     "lint-staged": ">=10",

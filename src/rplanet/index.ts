@@ -77,9 +77,9 @@ export type ICollectionStakingSettingsDict = Dictionary<
 >;
 
 export async function getStakingSettingsDict(): Promise<ICollectionStakingSettingsDict> {
-  const settings = await getStakingSettings();
+  const {rows} = await getStakingSettings();
 
-  const byCollection = groupBy(settings, "collection");
+  const byCollection = groupBy(rows, "collection");
 
   const stakingSettings: Dictionary<Dictionary<ICollectionStakingSettings>> =
     {};
