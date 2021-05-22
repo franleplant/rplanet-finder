@@ -1,6 +1,8 @@
 import {
   ICollectionStakingSettingsDict,
   ICollectionStakingSettings,
+  IPoolDict,
+  IPool,
 } from "./rplanet";
 import { getSales, SaleParams, Sale } from "./am";
 import { calcYield, ISaleWithStaking } from "./calcYield";
@@ -9,6 +11,7 @@ export interface IArgs {
   pageNumber: number;
   stakingSettings: ICollectionStakingSettingsDict;
   saleParams: SaleParams;
+  pools: IPoolDict;
 }
 
 export interface ISale extends ISaleWithStaking {
@@ -19,6 +22,7 @@ export default async function fetchCandidates({
   pageNumber = 1,
   stakingSettings,
   saleParams,
+  pools,
 }: IArgs): Promise<Array<ISale>> {
   const YIELD_THRESHOLD = process.env.YIELD_THRESHOLD || 0.5;
 
@@ -33,14 +37,21 @@ export default async function fetchCandidates({
       const schemaName = asset.schema.schema_name;
       const colSettings = stakingSettings?.[collectionName];
       const schemaSettings = colSettings?.[schemaName];
-      return [sale, schemaSettings] as [
+
+      const pool = pools[collectionName];
+
+      return [sale, schemaSettings, pool] as [
         Sale,
-        ICollectionStakingSettings | undefined
+        ICollectionStakingSettings | undefined,
+        IPool
       ];
     })
     // omit sale/assets that are not stakable in rplanet
-    .filter(([_sale, colStakingSettings]) => !!colStakingSettings)
-    .map(([sale, colStakingSettings]) => calcYield(sale, colStakingSettings!))
+    .filter(([_sale, colStakingSettings, _pool]) => !!colStakingSettings)
+    .filter(([_sale, _colStakingSettings, pool]) => !!pool)
+    .map(([sale, colStakingSettings, pool]) =>
+      calcYield(sale, colStakingSettings!, pool)
+    )
     .map((sale) => ({
       ...sale,
       url: `https://wax.atomichub.io/market/sale/${sale.sale_id}`,

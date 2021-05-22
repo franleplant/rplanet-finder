@@ -1,4 +1,4 @@
-export { getPools, IPool } from "./pools";
+export { getPools, IPool, IPoolDict } from "./pools";
 export {
   getSettings,
   ICollectionStakingSettings,

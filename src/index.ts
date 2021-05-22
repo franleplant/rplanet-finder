@@ -1,7 +1,12 @@
 import fs from "fs";
 import { flatten } from "lodash";
 import { SaleParams, SortOrder } from "./am";
-import { getSettings, ICollectionStakingSettingsDict } from "./rplanet";
+import {
+  getPools,
+  getSettings,
+  ICollectionStakingSettingsDict,
+  IPoolDict,
+} from "./rplanet";
 import fetchCandidatesPage, { ISale } from "./fetchCandidates";
 import { notify } from "./notify";
 import { openBrowser } from "./openBrowser";
@@ -17,11 +22,12 @@ const saleParams: SaleParams = {
 } as any;
 
 export async function fetchCandidates(
-  stakingSettings: ICollectionStakingSettingsDict
+  stakingSettings: ICollectionStakingSettingsDict,
+  pools: IPoolDict
 ): Promise<Array<ISale>> {
   const pages = await Promise.all([
-    fetchCandidatesPage({ pageNumber: 1, stakingSettings, saleParams }),
-    fetchCandidatesPage({ pageNumber: 2, stakingSettings, saleParams }),
+    fetchCandidatesPage({ pageNumber: 1, stakingSettings, saleParams, pools }),
+    fetchCandidatesPage({ pageNumber: 2, stakingSettings, saleParams, pools }),
   ]);
 
   return flatten(pages);
@@ -42,12 +48,13 @@ async function main(): Promise<void> {
   const MIN_WAIT_TIME = 1;
 
   const stakingSettings = await getSettings();
+  const pools = await getPools();
 
   while (true) {
     console.log("start");
     console.log("fetching...");
     try {
-      const candidates = await fetchCandidates(stakingSettings);
+      const candidates = await fetchCandidates(stakingSettings, pools);
       wait = Math.max(wait / 2, MIN_WAIT_TIME);
 
       logCandidates(stream, candidates);

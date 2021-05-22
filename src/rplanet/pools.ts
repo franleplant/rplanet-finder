@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { keyBy, Dictionary } from "lodash";
 
 export interface IResponse {
   next_key: string;
@@ -45,7 +46,9 @@ const params = {
 
 const url = "https://api.wax.alohaeos.com/v1/chain/get_table_rows";
 
-export async function getPools(): Promise<Array<IPool>> {
+export type IPoolDict = Dictionary<IPool>;
+
+export async function getPools(): Promise<IPoolDict> {
   const res = await fetch(url, {
     method: "POST",
     body: JSON.stringify(params),
@@ -56,5 +59,8 @@ export async function getPools(): Promise<Array<IPool>> {
   });
 
   const body: IResponse = await res.json();
-  return body.rows;
+  const pools = body.rows;
+  // groupt by collection name
+  const dict = keyBy(pools, "id");
+  return dict;
 }
