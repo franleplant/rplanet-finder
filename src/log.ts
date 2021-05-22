@@ -1,7 +1,10 @@
-import fs from 'fs'
+import fs from "fs";
 import { ISale } from "./fetchCandidates";
 
-export function logCandidates(stream: fs.WriteStream, sales: Array<ISale>): void {
+export function logCandidates(
+  stream: fs.WriteStream,
+  sales: Array<ISale>
+): void {
   if (sales.length === 0) {
     console.log("nothing");
     return;

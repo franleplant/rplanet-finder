@@ -1,5 +1,5 @@
 import notifier from "node-notifier";
-import {memoize} from 'lodash'
+import { memoize } from "lodash";
 import { ISale } from "./fetchCandidates";
 
 export function notifySale(sale: ISale): void {

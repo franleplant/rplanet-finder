@@ -1,13 +1,12 @@
 import fs from "fs";
 import { flatten } from "lodash";
 import { SaleParams, SortOrder } from "./am";
-import { getSettings, ICollectionStakingSettingsDict, } from "./rplanet";
+import { getSettings, ICollectionStakingSettingsDict } from "./rplanet";
 import fetchCandidatesPage, { ISale } from "./fetchCandidates";
-import {notify} from "./notify";
-import {openBrowser} from "./openBrowser";
-import {logCandidates} from './log'
-import timeout from './timeout'
-
+import { notify } from "./notify";
+import { openBrowser } from "./openBrowser";
+import { logCandidates } from "./log";
+import timeout from "./timeout";
 
 const saleParams: SaleParams = {
   // TODO type information looks outdated
@@ -66,4 +65,3 @@ async function main(): Promise<void> {
 }
 
 main().then(console.log, console.error);
-
