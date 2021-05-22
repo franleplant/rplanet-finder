@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import { promises as fs } from "fs";
 import { groupBy, keyBy, Dictionary } from "lodash";
 
+const path = "./src/data/staking.json";
 // TODO move to env
 const URL = "https://chain.wax.io/v1/chain/get_table_rows";
 
@@ -70,6 +71,9 @@ export async function getStakingSettings(): Promise<IResponse> {
     console.log("WARN: we got more settings to fetch");
   }
 
+  await fs.writeFile(path, JSON.stringify(data, null, 2));
+  console.log("stored", data);
+
   return data;
 }
 
@@ -80,7 +84,13 @@ export type ICollectionStakingSettingsDict = Dictionary<
 export async function getStakingSettingsDict(): Promise<ICollectionStakingSettingsDict> {
   const { rows } = await getStakingSettings();
 
-  const byCollection = groupBy(rows, "collection");
+  return toDict(rows);
+}
+
+export function toDict(
+  s: Array<ICollectionStakingSettings>
+): ICollectionStakingSettingsDict {
+  const byCollection = groupBy(s, "collection");
 
   const stakingSettings: Dictionary<Dictionary<ICollectionStakingSettings>> =
     {};
@@ -94,17 +104,14 @@ export async function getStakingSettingsDict(): Promise<ICollectionStakingSettin
 }
 
 export async function getSettings(): Promise<ICollectionStakingSettingsDict> {
-  const path = "./src/data/staking_grouped.json";
   try {
     const settings = await getStakingSettingsDict();
-    await fs.writeFile(path, JSON.stringify(settings, null, 2));
-    console.log("stored", path);
     return settings;
   } catch (err) {
     console.warn("error fetching staking settings, using cached", err);
     const settingsStr = await fs.readFile(path, { encoding: "utf-8" });
     const settings = JSON.parse(settingsStr);
     //console.log(settings)
-    return settings;
+    return toDict(settings.row);
   }
 }

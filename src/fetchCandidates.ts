@@ -40,6 +40,7 @@ export default async function fetchCandidates({
 
       const pool = pools[collectionName];
 
+      console.log(pool, schemaSettings);
       return [sale, schemaSettings, pool] as [
         Sale,
         ICollectionStakingSettings | undefined,

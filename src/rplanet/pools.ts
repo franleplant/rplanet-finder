@@ -39,9 +39,9 @@ const params = {
   key_type: "i64",
   limit: 1000,
   reverse: false,
-  scope: "bitcoinelite",
   show_player: false,
   table: "pools",
+  scope: "s.rplanet",
 };
 
 const url = "https://api.wax.alohaeos.com/v1/chain/get_table_rows";
@@ -51,7 +51,7 @@ export type IPoolDict = Dictionary<IPool>;
 export async function getPools(): Promise<IPoolDict> {
   const res = await fetch(url, {
     method: "POST",
-    body: JSON.stringify(params),
+    body: JSON.stringify({ ...params }),
     headers: {
       //"Accept": "*/*",
       //"Content-Type": "text/plain;charset=UTF-8",
