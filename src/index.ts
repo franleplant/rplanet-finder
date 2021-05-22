@@ -1,13 +1,13 @@
-import util from "util";
-import { exec as execRaw } from "child_process";
 import fs from "fs";
-import notifier from "node-notifier";
-import { flatten, memoize } from "lodash";
+import { flatten } from "lodash";
 import { SaleParams, SortOrder } from "./am";
 import { getSettings, ICollectionStakingSettingsDict, } from "./rplanet";
 import fetchCandidatesPage, { ISale } from "./fetchCandidates";
+import {notify} from "./notify";
+import {openBrowser} from "./openBrowser";
+import {logCandidates} from './log'
+import timeout from './timeout'
 
-const exec = util.promisify(execRaw);
 
 const saleParams: SaleParams = {
   // TODO type information looks outdated
@@ -17,63 +17,15 @@ const saleParams: SaleParams = {
   collection_blacklist: ["alien.worlds", "kennbosakgif"],
 } as any;
 
-export function timeout(seconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-}
+export async function fetchCandidates(
+  stakingSettings: ICollectionStakingSettingsDict
+): Promise<Array<ISale>> {
+  const pages = await Promise.all([
+    fetchCandidatesPage({ pageNumber: 1, stakingSettings, saleParams }),
+    fetchCandidatesPage({ pageNumber: 2, stakingSettings, saleParams }),
+  ]);
 
-export function notifySale(sale: ISale): void {
-  console.log("notifiying", sale.sale_id);
-  notifier.notify({
-    title: `New High Yield NFT found ${sale.sale_id}`,
-    message: sale.url,
-    open: sale.url,
-  });
-}
-
-const memoizedNotifySale = memoize(notifySale, (sale) => sale.sale_id);
-
-export function notify(sales: Array<ISale>): void {
-  if (sales.length === 0) {
-    return;
-  }
-
-  console.log("notifying");
-
-  for (const sale of sales) {
-    memoizedNotifySale(sale);
-  }
-}
-
-const memoizedOpen = memoize((url: string) => exec(`open ${url}`));
-
-export function openBrowser(sales: Array<ISale>): void {
-  if (sales.length === 0) {
-    return;
-  }
-
-  console.log("opening browser");
-
-  for (const sale of sales) {
-    memoizedOpen(sale.url);
-  }
-}
-
-function logCandidates(stream: fs.WriteStream, sales: Array<ISale>): void {
-  if (sales.length === 0) {
-    console.log("nothing");
-    return;
-  }
-  const date = new Date().toISOString();
-  console.log("writing to log");
-
-  for (const sale of sales) {
-    const url = sale.url;
-    const collection = (sale as any).collection_name;
-    const _yield = sale.staking_price_ratio.toFixed(2);
-    const name = sale.assets?.[0].name;
-    const reward = sale.staking_reward.toFixed(2);
-    stream.write(`${date} ${_yield} ${url} ${collection} ${name} ${reward} \n`);
-  }
+  return flatten(pages);
 }
 
 async function main(): Promise<void> {
@@ -115,13 +67,3 @@ async function main(): Promise<void> {
 
 main().then(console.log, console.error);
 
-export async function fetchCandidates(
-  stakingSettings: ICollectionStakingSettingsDict
-): Promise<Array<ISale>> {
-  const pages = await Promise.all([
-    fetchCandidatesPage({ pageNumber: 1, stakingSettings, saleParams }),
-    fetchCandidatesPage({ pageNumber: 2, stakingSettings, saleParams }),
-  ]);
-
-  return flatten(pages);
-}
