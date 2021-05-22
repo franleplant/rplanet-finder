@@ -31,8 +31,8 @@ export default async function fetchCandidates({
       const [asset] = sale.assets;
       const collectionName = asset.collection.collection_name;
       const schemaName = asset.schema.schema_name;
-      const colSettings = stakingSettings[collectionName];
-      const schemaSettings = colSettings[schemaName];
+      const colSettings = stakingSettings?.[collectionName];
+      const schemaSettings = colSettings?.[schemaName];
       return [sale, schemaSettings] as [
         Sale,
         ICollectionStakingSettings | undefined

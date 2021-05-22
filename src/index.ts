@@ -4,10 +4,7 @@ import fs from "fs";
 import notifier from "node-notifier";
 import { flatten, memoize } from "lodash";
 import { SaleParams, SortOrder } from "./am";
-import {
-  getStakingSettingsDict,
-  ICollectionStakingSettingsDict,
-} from "./rplanet";
+import { getSettings, ICollectionStakingSettingsDict, } from "./rplanet";
 import fetchCandidatesPage, { ISale } from "./fetchCandidates";
 
 const exec = util.promisify(execRaw);
@@ -93,7 +90,7 @@ async function main(): Promise<void> {
   const MAX_WAIT_TIME = 30;
   const MIN_WAIT_TIME = 1;
 
-  const stakingSettings = await getStakingSettingsDict();
+  const stakingSettings = await getSettings();
 
   while (true) {
     console.log("start");

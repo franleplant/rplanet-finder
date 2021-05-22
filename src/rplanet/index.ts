@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import {promises as fs} from 'fs'
 import { groupBy, keyBy, Dictionary } from "lodash";
 
 // TODO move to env
@@ -90,4 +91,20 @@ export async function getStakingSettingsDict(): Promise<ICollectionStakingSettin
   });
 
   return stakingSettings;
+}
+
+export async function getSettings():  Promise<ICollectionStakingSettingsDict> {
+  const path = "./src/data/staking_grouped.json"
+  try {
+    const settings = await getStakingSettingsDict()
+    await fs.writeFile(path, JSON.stringify(settings, null, 2));
+    console.log("stored", path)
+    return settings
+  } catch (err) {
+    console.warn("error fetching staking settings, using cached", err)
+    const settingsStr = await fs.readFile(path, {encoding: "utf-8"});
+    const settings = JSON.parse(settingsStr)
+    //console.log(settings)
+    return settings
+  }
 }
