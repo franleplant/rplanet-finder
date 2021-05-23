@@ -1,5 +1,6 @@
 import fs from "fs";
 import { flatten } from "lodash";
+import chalk from 'chalk'
 import { ISaleParams, SortOrder } from "./am";
 import {
   getPools,
@@ -19,8 +20,8 @@ const MIN_WAIT_TIME = 1;
 const LOG_FILE = "log";
 
 export default async function rpfinder(flags: IFlags): Promise<void> {
-  console.log(`check the logs by: tail -f ${LOG_FILE}`);
-  console.log("using flags", JSON.stringify(flags));
+  console.log(chalk.magenta(`Check the logs by: tail -f ${LOG_FILE}`));
+  console.log(chalk.magenta("Using flags", JSON.stringify(flags)));
   const stream = fs.createWriteStream(LOG_FILE, { flags: "a" });
   setCleanup(stream);
 
@@ -89,7 +90,7 @@ export async function fetchCandidates({
 
 export function setCleanup(log: fs.WriteStream): void {
   const cleanup = () => {
-    console.log("cleaning up");
+    console.log(chalk.magenta("cleaning up"));
     log.end();
     process.exit(0);
   };
@@ -117,6 +118,6 @@ export function getSaleParams(
     params.collection_whitelist = [flags.collection];
   }
 
-  console.log("Using sale params", JSON.stringify(params));
+  console.log(chalk.magenta("Using sale params", JSON.stringify(params)));
   return params;
 }

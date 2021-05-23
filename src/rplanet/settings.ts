@@ -108,7 +108,7 @@ export async function getSettings(): Promise<ICollectionStakingSettingsDict> {
     const settings = await getStakingSettingsDict();
     return settings;
   } catch (err) {
-    console.warn("error fetching staking settings, using cached", err);
+    console.warn("WARN fetching staking settings, using cached", err);
     const settingsStr = await fs.readFile(path, { encoding: "utf-8" });
     //console.log(settingsStr)
     const settings = JSON.parse(settingsStr);

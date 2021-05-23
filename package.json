@@ -11,6 +11,7 @@
     "@tsconfig/node16": "^1.0.1",
     "@types/node-notifier": "^8.0.0",
     "atomicmarket": "^0.1.1",
+    "chalk": "^4.1.1",
     "lodash": "^4.17.21",
     "meow": "^9.0.0",
     "node-fetch": "^2.6.1",
