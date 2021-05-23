@@ -19,3 +19,7 @@ yarn install
 yarn start --help
 yarn start --collection=rplanet
 ```
+
+## Dev notes
+
+- atomic market swagger https://wax.api.atomicassets.io/atomicmarket/docs/swagger/#/sales/get_v1_sales
