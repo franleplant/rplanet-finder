@@ -1,6 +1,6 @@
 import fs from "fs";
 import { flatten } from "lodash";
-import { SaleParams, SortOrder } from "./am";
+import { ISaleParams, SortOrder } from "./am";
 import {
   getPools,
   getSettings,
@@ -12,84 +12,43 @@ import { notify } from "./notify";
 import { openBrowser } from "./openBrowser";
 import { logCandidates } from "./log";
 import timeout from "./timeout";
-import { params } from "./params";
+import { IFlags } from "./cli";
 
-const saleParams: SaleParams = {
-  // TODO type information looks outdated
-  sort: "updated" as any,
-  order: SortOrder.Desc,
-  symbol: "WAX",
-  collection_blacklist: ["alien.worlds", "kennbosakgif"],
-  collection_whitelist: [],
-  // TODO this field should not be here if TEMPLATE is undefined
-  //template_id: params.TEMPLATE,
-} as any;
+const MAX_WAIT_TIME = 30;
+const MIN_WAIT_TIME = 1;
+const LOG_FILE = "log";
 
-export async function fetchCandidates(
-  otherSaleParams: any,
-  stakingSettings: ICollectionStakingSettingsDict,
-  pools: IPoolDict
-): Promise<Array<ISale>> {
-  const pages = await Promise.all([
-    fetchCandidatesPage({
-      pageNumber: 1,
-      stakingSettings,
-      saleParams: { ...saleParams, ...otherSaleParams },
-      pools,
-    }),
-    fetchCandidatesPage({
-      pageNumber: 2,
-      stakingSettings,
-      saleParams: { ...saleParams, ...otherSaleParams },
-      pools,
-    }),
-  ]);
-
-  return flatten(pages);
-}
-
-async function main(): Promise<void> {
-  const stream = fs.createWriteStream("log", { flags: "a" });
-  const cleanup = () => {
-    console.log("cleaning up");
-    stream.end();
-    process.exit(0);
-  };
-  process.on("exit", cleanup);
-  process.on("SIGINT", cleanup);
+export default async function rpfinder(flags: IFlags): Promise<void> {
+  const stream = fs.createWriteStream(LOG_FILE, { flags: "a" });
+  setCleanup(stream);
 
   let wait = 1;
-  const MAX_WAIT_TIME = 30;
-  const MIN_WAIT_TIME = 1;
 
   const stakingSettings = await getSettings();
   const pools = await getPools();
 
-  let collectionWhitelist = Object.keys(stakingSettings);
-  if (params.COLLECTION) {
-    collectionWhitelist = [params.COLLECTION];
-  }
-  console.log(
-    "only looking for the following collections",
-    JSON.stringify(collectionWhitelist)
-  );
+  const collections = Object.keys(stakingSettings);
+  const saleParams = getSaleParams(flags, collections);
+
+  console.log(`check the logs by: tail -f ${LOG_FILE}`);
 
   while (true) {
     console.log("start");
     console.log("fetching...");
     try {
-      const candidates = await fetchCandidates(
-        { collection_whitelist: collectionWhitelist },
+      const candidates = await fetchCandidates({
+        saleParams,
         stakingSettings,
-        pools
-      );
+        pools,
+        flags,
+      });
       wait = Math.max(wait / 2, MIN_WAIT_TIME);
 
       logCandidates(stream, candidates);
-      if (params.NOTIFY) {
+      if (flags.notify) {
         notify(candidates);
       }
-      if (params.OPEN) {
+      if (flags.notify) {
         openBrowser(candidates);
       }
     } catch (err) {
@@ -103,4 +62,62 @@ async function main(): Promise<void> {
   }
 }
 
-main().then(console.log, console.error);
+export async function fetchCandidates({
+  saleParams,
+  stakingSettings,
+  pools,
+  flags,
+}: {
+  saleParams: ISaleParams;
+  stakingSettings: ICollectionStakingSettingsDict;
+  pools: IPoolDict;
+  flags: IFlags;
+}): Promise<Array<ISale>> {
+  const params = {
+    stakingSettings,
+    saleParams: { ...saleParams },
+    pools,
+    flags,
+  };
+
+  const pages = await Promise.all([
+    fetchCandidatesPage({ ...params, pageNumber: 1 }),
+    fetchCandidatesPage({ ...params, pageNumber: 2 }),
+  ]);
+
+  return flatten(pages);
+}
+
+export function setCleanup(log: fs.WriteStream): void {
+  const cleanup = () => {
+    console.log("cleaning up");
+    log.end();
+    process.exit(0);
+  };
+  process.on("exit", cleanup);
+  process.on("SIGINT", cleanup);
+}
+
+export function getSaleParams(
+  flags: IFlags,
+  collections: Array<string>
+): ISaleParams {
+  const params: ISaleParams = {
+    sort: "updated",
+    order: SortOrder.Desc,
+    symbol: "WAX",
+    collection_blacklist: ["alien.worlds", "kennbosakgif"],
+    collection_whitelist: collections,
+  };
+
+  if (flags.template) {
+    params.template_id = flags.template;
+  }
+
+  if (flags.collection) {
+    params.collection_whitelist = [flags.collection];
+  }
+
+  console.log("Using sale params", JSON.stringify(params));
+  return params;
+}

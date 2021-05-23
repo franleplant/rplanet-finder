@@ -2,11 +2,16 @@
   "name": "rplanet-finder",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">= 16"
+  },
   "license": "MIT",
   "dependencies": {
+    "@tsconfig/node16": "^1.0.1",
     "@types/node-notifier": "^8.0.0",
     "atomicmarket": "^0.1.1",
     "lodash": "^4.17.21",
+    "meow": "^10.0.0",
     "node-fetch": "^2.6.1",
     "node-notifier": "^9.0.1",
     "ts-node": "^9.1.1",
@@ -25,6 +30,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
+    "cli": "ts-node src/cli.ts",
     "typecheck": "tsc --noEmit",
     "prettier": "prettier  \"**/*.ts\"",
     "format": "yarn prettier --write",

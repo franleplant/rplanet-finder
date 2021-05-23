@@ -17,5 +17,5 @@ export function openBrowser(sales: Array<ISale>): void {
   // only open the first 5
   sales.slice(0, 5).forEach((sale) => {
     memoizedOpen(sale.url);
-  })
+  });
 }

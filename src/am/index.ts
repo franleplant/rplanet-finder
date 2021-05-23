@@ -1,5 +1,4 @@
 import fetch from "node-fetch";
-import { range, flatten } from "lodash";
 import {
   Sale,
   SaleSort,
@@ -14,7 +13,13 @@ const URL = "https://wax.api.atomicassets.io";
 const NAMESPACE = "atomicmarket";
 const api = new ExplorerApi(URL, NAMESPACE, { fetch: fetch as any });
 
-export { Sale, SaleParams, SaleState, SaleSort, SortOrder };
+export interface ISaleParams extends Omit<SaleParams, "sort"> {
+  sort?: SaleSort | "updated";
+  collection_blacklist?: Array<string>;
+  collection_whitelist?: Array<string>;
+}
+
+export { Sale, SaleState, SaleSort, SortOrder };
 
 export const getSales: typeof api.getSales = (...args) => api.getSales(...args);
 

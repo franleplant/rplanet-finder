@@ -23,5 +23,5 @@ export function notify(sales: Array<ISale>): void {
   // only notify the first 5
   sales.slice(0, 5).forEach((sale) => {
     memoizedNotifySale(sale);
-  })
+  });
 }

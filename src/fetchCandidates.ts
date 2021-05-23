@@ -4,19 +4,20 @@ import {
   IPoolDict,
   IPool,
 } from "./rplanet";
-import { getSales, SaleParams, Sale } from "./am";
+import { getSales, ISaleParams, Sale } from "./am";
 import { calcYield, ISaleWithStaking } from "./calcYield";
-import { params } from "./params";
+import { IFlags } from "./cli";
+
+export interface ISale extends ISaleWithStaking {
+  url: string;
+}
 
 export interface IArgs {
   pageNumber: number;
   stakingSettings: ICollectionStakingSettingsDict;
-  saleParams: SaleParams;
+  saleParams: ISaleParams;
   pools: IPoolDict;
-}
-
-export interface ISale extends ISaleWithStaking {
-  url: string;
+  flags: IFlags;
 }
 
 export default async function fetchCandidates({
@@ -24,8 +25,9 @@ export default async function fetchCandidates({
   stakingSettings,
   saleParams,
   pools,
+  flags,
 }: IArgs): Promise<Array<ISale>> {
-  const sales = await getSales({ ...saleParams }, pageNumber, 100);
+  const sales = await getSales({ ...saleParams } as any, pageNumber, 100);
 
   const salesWithStaking = sales
     .filter((sale) => sale.assets.length === 1)
@@ -55,7 +57,7 @@ export default async function fetchCandidates({
       ...sale,
       url: `https://wax.atomichub.io/market/sale/${sale.sale_id}`,
     }))
-    .filter((sale) => sale.reward_ratio >= params.YIELD)
+    .filter((sale) => sale.reward_ratio >= flags.yield)
     .sort((saleA, saleB) => saleB.reward_ratio - saleA.reward_ratio)
     .map((sale) => sale);
 
