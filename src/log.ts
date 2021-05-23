@@ -18,11 +18,10 @@ export function logCandidates(
   sales: Array<ISale>
 ): void {
   if (sales.length === 0) {
-    console.log("nothing");
     return;
   }
   const date = new Date().toISOString();
-  console.log("writing to log");
+  console.log("logging");
 
   for (const sale of sales) {
     memoizedLog(sale, date, stream);

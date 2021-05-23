@@ -2,6 +2,7 @@
   "name": "rplanet-finder",
   "version": "1.0.0",
   "main": "index.js",
+  "description": "Find high yield NFTs in Atomic Market to stake in rplanet",
   "engines": {
     "node": ">= 16"
   },

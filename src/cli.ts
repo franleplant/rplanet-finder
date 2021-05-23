@@ -20,12 +20,12 @@ const cli = meow(
       open: {
         type: "boolean",
         alias: "o",
-        default: true,
+        default: false,
       },
       notify: {
         type: "boolean",
         alias: "n",
-        default: true,
+        default: false,
       },
       template: {
         type: "number",

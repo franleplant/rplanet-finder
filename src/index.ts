@@ -33,7 +33,6 @@ export default async function rpfinder(flags: IFlags): Promise<void> {
   const saleParams = getSaleParams(flags, collections);
 
   while (true) {
-    console.log("start");
     console.log("fetching...");
     try {
       const candidates = await fetchCandidates({
@@ -42,6 +41,7 @@ export default async function rpfinder(flags: IFlags): Promise<void> {
         pools,
         flags,
       });
+      console.log(`got ${candidates?.length} assets`)
       wait = Math.max(wait / 2, MIN_WAIT_TIME);
 
       logCandidates(stream, candidates);
@@ -57,7 +57,6 @@ export default async function rpfinder(flags: IFlags): Promise<void> {
     }
     console.log(`waiting ${wait} seconds...`);
     await timeout(wait);
-    console.log("done");
     console.log("===========");
   }
 }
