@@ -19,6 +19,8 @@ const MIN_WAIT_TIME = 1;
 const LOG_FILE = "log";
 
 export default async function rpfinder(flags: IFlags): Promise<void> {
+  console.log(`check the logs by: tail -f ${LOG_FILE}`);
+  console.log("using flags", JSON.stringify(flags));
   const stream = fs.createWriteStream(LOG_FILE, { flags: "a" });
   setCleanup(stream);
 
@@ -29,8 +31,6 @@ export default async function rpfinder(flags: IFlags): Promise<void> {
 
   const collections = Object.keys(stakingSettings);
   const saleParams = getSaleParams(flags, collections);
-
-  console.log(`check the logs by: tail -f ${LOG_FILE}`);
 
   while (true) {
     console.log("start");

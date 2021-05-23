@@ -16,7 +16,6 @@ const cli = meow(
 
 `,
   {
-    importMeta: import.meta,
     flags: {
       open: {
         type: "boolean",
