@@ -1,6 +1,6 @@
 import fs from "fs";
 import { flatten } from "lodash";
-import chalk from 'chalk'
+import chalk from "chalk";
 import { ISaleParams, SortOrder } from "./am";
 import {
   getPools,
@@ -42,7 +42,7 @@ export default async function rpfinder(flags: IFlags): Promise<void> {
         pools,
         flags,
       });
-      console.log(`got ${candidates?.length} assets`)
+      console.log(`got ${candidates?.length} assets`);
       wait = Math.max(wait / 2, MIN_WAIT_TIME);
 
       logCandidates(stream, candidates);

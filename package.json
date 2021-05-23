@@ -31,8 +31,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "cli": "ts-node src/cli.ts",
+    "start": "ts-node src/cli.ts",
     "typecheck": "tsc --noEmit",
     "prettier": "prettier  \"**/*.ts\"",
     "format": "yarn prettier --write",
