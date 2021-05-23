@@ -14,7 +14,8 @@ export function openBrowser(sales: Array<ISale>): void {
 
   console.log("opening browser");
 
-  for (const sale of sales) {
+  // only open the first 5
+  sales.slice(0, 5).forEach((sale) => {
     memoizedOpen(sale.url);
-  }
+  })
 }

@@ -20,7 +20,8 @@ export function notify(sales: Array<ISale>): void {
 
   console.log("notifying");
 
-  for (const sale of sales) {
+  // only notify the first 5
+  sales.slice(0, 5).forEach((sale) => {
     memoizedNotifySale(sale);
-  }
+  })
 }
