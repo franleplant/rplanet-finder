@@ -1,6 +1,6 @@
 import notifier from "node-notifier";
 import { memoize } from "lodash";
-import { ISale } from "./fetchCandidates";
+import { ISale } from "./calcCandidates";
 
 export function notifySale(sale: ISale): void {
   console.log("notifiying", sale.sale_id);

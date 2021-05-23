@@ -2,6 +2,7 @@ import { ICollectionStakingSettings, IPool } from "./rplanet";
 import { Sale } from "./am";
 
 export interface ISaleWithStaking extends Sale {
+  price_wax: number;
   /* aether per hour yield */
   staking_reward: number;
   /* aether per hour yield per wax*/
@@ -77,6 +78,7 @@ export function calcYield(
 
   return {
     ...sale,
+    price_wax: priceInWax,
     staking_reward: stakingReward,
     staking_price_ratio: stakingPriceRatio,
     reward_ratio: rewardRatio,

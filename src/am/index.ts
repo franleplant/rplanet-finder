@@ -17,6 +17,8 @@ export interface ISaleParams extends Omit<SaleParams, "sort"> {
   sort?: SaleSort | "updated";
   collection_blacklist?: Array<string>;
   collection_whitelist?: Array<string>;
+  min_assets?: number;
+  asset_id?: number;
 }
 
 export { Sale, SaleState, SaleSort, SortOrder };

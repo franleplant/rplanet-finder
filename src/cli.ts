@@ -10,9 +10,11 @@ const cli = meow(
     Options
       --open, -o automatically open browser window
       --notify, -n notify of new sales found
-      --template, -tpl find a specific NFT template by template_id
+      --yield, -y yield threshold to filter sales
+      --max-price, -Mp max price in wax
       --collection, -c specify a collection to find on
-      --yield, y yield threshold to filter sales
+      --template, -tpl find a specific NFT template by template_id
+      --asset, -a asset id (this will return a single candidate)
 
 `,
   {
@@ -39,6 +41,14 @@ const cli = meow(
         type: "number",
         alias: "y",
         default: 0.5,
+      },
+      asset: {
+        type: "number",
+        alias: "a",
+      },
+      maxPrice: {
+        type: "number",
+        alias: "Mp",
       },
     },
   }

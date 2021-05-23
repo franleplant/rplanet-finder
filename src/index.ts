@@ -1,14 +1,14 @@
 import fs from "fs";
 import { flatten } from "lodash";
 import chalk from "chalk";
-import { ISaleParams, SortOrder } from "./am";
+import { getSales, ISaleParams, SortOrder } from "./am";
 import {
   getPools,
   getSettings,
   ICollectionStakingSettingsDict,
   IPoolDict,
 } from "./rplanet";
-import fetchCandidatesPage, { ISale } from "./fetchCandidates";
+import calcCandidates, { ISale } from "./calcCandidates";
 import { notify } from "./notify";
 import { openBrowser } from "./openBrowser";
 import { logCandidates } from "./log";
@@ -73,19 +73,14 @@ export async function fetchCandidates({
   pools: IPoolDict;
   flags: IFlags;
 }): Promise<Array<ISale>> {
-  const params = {
-    stakingSettings,
-    saleParams: { ...saleParams },
-    pools,
-    flags,
-  };
-
   const pages = await Promise.all([
-    fetchCandidatesPage({ ...params, pageNumber: 1 }),
-    fetchCandidatesPage({ ...params, pageNumber: 2 }),
+    getSales({ ...saleParams } as any, 1),
+    getSales({ ...saleParams } as any, 2),
   ]);
 
-  return flatten(pages);
+  const sales = flatten(pages);
+
+  return calcCandidates({ sales, stakingSettings, pools, flags });
 }
 
 export function setCleanup(log: fs.WriteStream): void {
@@ -103,6 +98,8 @@ export function getSaleParams(
   collections: Array<string>
 ): ISaleParams {
   const params: ISaleParams = {
+    max_assets: 1,
+    min_assets: 1,
     sort: "updated",
     order: SortOrder.Desc,
     symbol: "WAX",
@@ -116,6 +113,14 @@ export function getSaleParams(
 
   if (flags.collection) {
     params.collection_whitelist = [flags.collection];
+  }
+
+  if (flags.asset) {
+    params.asset_id = flags.asset;
+  }
+
+  if (flags.max_price) {
+    params.max_price = flags.maxPrice;
   }
 
   console.log(chalk.magenta("Using sale params", JSON.stringify(params)));

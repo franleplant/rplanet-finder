@@ -1,7 +1,7 @@
 import util from "util";
 import { exec as execRaw } from "child_process";
 import { memoize } from "lodash";
-import { ISale } from "./fetchCandidates";
+import { ISale } from "./calcCandidates";
 
 const exec = util.promisify(execRaw);
 

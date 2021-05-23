@@ -13,22 +13,18 @@ export interface ISale extends ISaleWithStaking {
 }
 
 export interface IArgs {
-  pageNumber: number;
+  sales: Array<Sale>;
   stakingSettings: ICollectionStakingSettingsDict;
-  saleParams: ISaleParams;
   pools: IPoolDict;
   flags: IFlags;
 }
 
-export default async function fetchCandidates({
-  pageNumber = 1,
+export default async function calcCandidates({
+  sales,
   stakingSettings,
-  saleParams,
   pools,
   flags,
 }: IArgs): Promise<Array<ISale>> {
-  const sales = await getSales({ ...saleParams } as any, pageNumber, 100);
-
   const salesWithStaking = sales
     .filter((sale) => sale.assets.length === 1)
     // calculate the colStakingSettings
