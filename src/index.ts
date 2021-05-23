@@ -12,6 +12,7 @@ import { notify } from "./notify";
 import { openBrowser } from "./openBrowser";
 import { logCandidates } from "./log";
 import timeout from "./timeout";
+import { params } from "./params";
 
 const saleParams: SaleParams = {
   // TODO type information looks outdated
@@ -19,15 +20,29 @@ const saleParams: SaleParams = {
   order: SortOrder.Desc,
   symbol: "WAX",
   collection_blacklist: ["alien.worlds", "kennbosakgif"],
+  collection_whitelist: [],
+  // TODO this field should not be here if TEMPLATE is undefined
+  //template_id: params.TEMPLATE,
 } as any;
 
 export async function fetchCandidates(
+  otherSaleParams: any,
   stakingSettings: ICollectionStakingSettingsDict,
   pools: IPoolDict
 ): Promise<Array<ISale>> {
   const pages = await Promise.all([
-    fetchCandidatesPage({ pageNumber: 1, stakingSettings, saleParams, pools }),
-    fetchCandidatesPage({ pageNumber: 2, stakingSettings, saleParams, pools }),
+    fetchCandidatesPage({
+      pageNumber: 1,
+      stakingSettings,
+      saleParams: { ...saleParams, ...otherSaleParams },
+      pools,
+    }),
+    fetchCandidatesPage({
+      pageNumber: 2,
+      stakingSettings,
+      saleParams: { ...saleParams, ...otherSaleParams },
+      pools,
+    }),
   ]);
 
   return flatten(pages);
@@ -50,16 +65,33 @@ async function main(): Promise<void> {
   const stakingSettings = await getSettings();
   const pools = await getPools();
 
+  let collectionWhitelist = Object.keys(stakingSettings);
+  if (params.COLLECTION) {
+    collectionWhitelist = [params.COLLECTION];
+  }
+  console.log(
+    "only looking for the following collections",
+    JSON.stringify(collectionWhitelist)
+  );
+
   while (true) {
     console.log("start");
     console.log("fetching...");
     try {
-      const candidates = await fetchCandidates(stakingSettings, pools);
+      const candidates = await fetchCandidates(
+        { collection_whitelist: collectionWhitelist },
+        stakingSettings,
+        pools
+      );
       wait = Math.max(wait / 2, MIN_WAIT_TIME);
 
       logCandidates(stream, candidates);
-      notify(candidates);
-      openBrowser(candidates);
+      if (params.NOTIFY) {
+        notify(candidates);
+      }
+      if (params.OPEN) {
+        openBrowser(candidates);
+      }
     } catch (err) {
       console.error(err);
       wait = Math.min(wait * 2, MAX_WAIT_TIME);

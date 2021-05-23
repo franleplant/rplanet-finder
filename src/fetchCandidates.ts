@@ -6,6 +6,7 @@ import {
 } from "./rplanet";
 import { getSales, SaleParams, Sale } from "./am";
 import { calcYield, ISaleWithStaking } from "./calcYield";
+import { params } from "./params";
 
 export interface IArgs {
   pageNumber: number;
@@ -24,8 +25,6 @@ export default async function fetchCandidates({
   saleParams,
   pools,
 }: IArgs): Promise<Array<ISale>> {
-  const YIELD_THRESHOLD = process.env.YIELD_THRESHOLD || 0.5;
-
   const sales = await getSales({ ...saleParams }, pageNumber, 100);
 
   const salesWithStaking = sales
@@ -40,16 +39,15 @@ export default async function fetchCandidates({
 
       const pool = pools[collectionName];
 
-      console.log(pool, schemaSettings);
+      //console.log(collectionName, schemaName, pool, schemaSettings);
       return [sale, schemaSettings, pool] as [
         Sale,
         ICollectionStakingSettings | undefined,
-        IPool
+        IPool | undefined
       ];
     })
     // omit sale/assets that are not stakable in rplanet
     .filter(([_sale, colStakingSettings, _pool]) => !!colStakingSettings)
-    .filter(([_sale, _colStakingSettings, pool]) => !!pool)
     .map(([sale, colStakingSettings, pool]) =>
       calcYield(sale, colStakingSettings!, pool)
     )
@@ -57,10 +55,8 @@ export default async function fetchCandidates({
       ...sale,
       url: `https://wax.atomichub.io/market/sale/${sale.sale_id}`,
     }))
-    .filter((sale) => sale.staking_price_ratio >= YIELD_THRESHOLD)
-    .sort(
-      (saleA, saleB) => saleB.staking_price_ratio - saleA.staking_price_ratio
-    )
+    .filter((sale) => sale.reward_ratio >= params.YIELD)
+    .sort((saleA, saleB) => saleB.reward_ratio - saleA.reward_ratio)
     .map((sale) => sale);
 
   return salesWithStaking;
