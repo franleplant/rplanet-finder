@@ -11,7 +11,14 @@ import { ExplorerApi } from "atomicmarket";
 // TODO extract from env, probably use dotenv or similar solutions
 const URL = "https://wax.api.atomicassets.io";
 const NAMESPACE = "atomicmarket";
-const api = new ExplorerApi(URL, NAMESPACE, { fetch: fetch as any });
+const api = new ExplorerApi(URL, NAMESPACE, {
+  fetch: (url) =>
+    fetch(url, {
+      headers: {
+        "Cache-Control": "no-cache",
+      },
+    }),
+});
 
 export interface ISaleParams extends Omit<SaleParams, "sort"> {
   sort?: SaleSort | "updated";
