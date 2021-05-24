@@ -49,7 +49,7 @@ export default async function rpfinder(flags: IFlags): Promise<void> {
       if (flags.notify) {
         notify(candidates);
       }
-      if (flags.notify) {
+      if (flags.open) {
         openBrowser(candidates);
       }
     } catch (err) {
