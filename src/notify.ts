@@ -18,7 +18,7 @@ export function notify(sales: Array<ISale>): void {
     return;
   }
 
-  console.log("notifying");
+  process.stdout.write("n");
 
   // only notify the first 5
   sales.slice(0, 5).forEach((sale) => {

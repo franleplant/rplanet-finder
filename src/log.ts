@@ -24,7 +24,6 @@ export function logCandidates(
     return;
   }
   const date = new Date().toISOString();
-  console.log("logging");
 
   for (const sale of sales) {
     memoizedLog(sale, date, stream);

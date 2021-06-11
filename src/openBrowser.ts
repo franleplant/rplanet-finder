@@ -12,7 +12,7 @@ export function openBrowser(sales: Array<ISale>): void {
     return;
   }
 
-  console.log("opening browser");
+  process.stdout.write("b");
 
   // only open the first 5
   sales.slice(0, 5).forEach((sale) => {
